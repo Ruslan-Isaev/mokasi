@@ -1,0 +1,53 @@
+# Папки виртуальных окружений
+venv/
+env/
+.venv/
+.env/
+
+# Кэш Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Распределения и сборки
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Конфигурационные файлы (часто содержат секреты)
+config.json
+*.config.json
+config.*.json
+.env
+.env.local
+*.env.*.local
+
+# IDE и редакторы
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Логи и временные файлы
+*.log
+*.tmp
+*.temp
+
+# Операционные системы
+.DS_Store
+Thumbs.db
+*.db
+
+# Конфигурация pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Пользовательские директории (добавьте по необходимости)
+# data/
+# media/
+# uploads/
