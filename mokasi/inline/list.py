@@ -1,0 +1,298 @@
+# Mokasi — a modular personal Telegram bot framework
+# Inline paginated lists, ported from Hikka
+# (https://github.com/hikariatama/Hikka) and adapted for aiogram 3
+import asyncio
+import contextlib
+import functools
+import logging
+import time
+import traceback
+import typing
+
+from aiogram.exceptions import TelegramRetryAfter
+from aiogram.types import CallbackQuery, InlineKeyboardMarkup
+from aiogram.types import Message as AiogramMessage
+
+from .. import utils
+from ..types import ReplyMarkup
+from .types import InlineMessage, InlineUnit
+
+logger = logging.getLogger(__name__)
+
+
+class List(InlineUnit):
+    async def list(
+        self,
+        message: typing.Union[AiogramMessage, int],
+        strings: typing.List[str],
+        *,
+        force_me: bool = False,
+        always_allow: typing.Optional[typing.List[int]] = None,
+        manual_security: bool = False,
+        disable_security: bool = False,
+        ttl: typing.Union[int, bool] = False,
+        on_unload: typing.Optional[typing.Callable[[], typing.Any]] = None,
+        silent: bool = False,
+        custom_buttons: typing.Optional[ReplyMarkup] = None,
+    ) -> typing.Union[bool, InlineMessage]:
+        """
+        Send inline list to chat
+        :param message: Where to send list. Can be either `Message` or `int`
+        :param strings: List of strings, which should become inline list
+        :param force_me: Either this list buttons must be pressed only by
+                         owner scope or no
+        :param always_allow: Users, that are allowed to press buttons in
+                             addition to previous rules
+        :param ttl: Time, when the list is going to be unloaded
+        :param on_unload: Callback, called when list is unloaded and/or closed
+        :param manual_security: By default, security of inline buttons is
+                                inherited from the caller (command)
+        :param disable_security: Disable all security checks on this list
+        :param silent: Whether the list must be sent silently
+        :param custom_buttons: Custom buttons to add above native ones
+        :return: If list is sent, returns :obj:`InlineMessage`, otherwise
+                 returns `False`
+        """
+        custom_buttons = self._validate_markup(custom_buttons)
+
+        if not isinstance(manual_security, bool):
+            logger.error(
+                "Invalid type for `manual_security`. Expected `bool`, got `%s`",
+                type(manual_security),
+            )
+            return False
+
+        if not isinstance(silent, bool):
+            logger.error(
+                "Invalid type for `silent`. Expected `bool`, got `%s`",
+                type(silent),
+            )
+            return False
+
+        if not isinstance(disable_security, bool):
+            logger.error(
+                "Invalid type for `disable_security`. Expected `bool`, got `%s`",
+                type(disable_security),
+            )
+            return False
+
+        if not isinstance(message, (AiogramMessage, int)):
+            logger.error(
+                "Invalid type for `message`. Expected `Message` or `int`, got `%s`",
+                type(message),
+            )
+            return False
+
+        if not isinstance(force_me, bool):
+            logger.error(
+                "Invalid type for `force_me`. Expected `bool`, got `%s`",
+                type(force_me),
+            )
+            return False
+
+        if not isinstance(strings, list) or not strings:
+            logger.error(
+                (
+                    "Invalid type for `strings`. Expected `list` with at least one"
+                    " element, got `%s`"
+                ),
+                type(strings),
+            )
+            return False
+
+        if len(strings) > 50:
+            logger.error("Too much pages for `strings` (%s)", len(strings))
+            return False
+
+        if always_allow and not isinstance(always_allow, list):
+            logger.error(
+                "Invalid type for `always_allow`. Expected `list`, got `%s`",
+                type(always_allow),
+            )
+            return False
+
+        if not always_allow:
+            always_allow = []
+
+        if not isinstance(ttl, int) and ttl:
+            logger.error(
+                "Invalid type for `ttl`. Expected `int` or `False`, got `%s`",
+                type(ttl),
+            )
+            return False
+
+        unit_id = utils.rand(16)
+
+        perms_map = None if manual_security else self._find_caller_sec_map()
+
+        self._units[unit_id] = {
+            "type": "list",
+            "caller": message,
+            "chat": None,
+            "message_id": None,
+            "top_msg_id": (
+                message.message_id if isinstance(message, AiogramMessage) else None
+            ),
+            "uid": unit_id,
+            "current_index": 0,
+            "strings": strings,
+            **({"ttl": round(time.time()) + ttl} if ttl else {}),
+            **({"force_me": force_me} if force_me else {}),
+            **({"disable_security": disable_security} if disable_security else {}),
+            **({"on_unload": on_unload} if callable(on_unload) else {}),
+            **({"always_allow": always_allow} if always_allow else {}),
+            **({"perms_map": perms_map} if perms_map else {}),
+            **({"message": message} if isinstance(message, AiogramMessage) else {}),
+            **({"custom_buttons": custom_buttons} if custom_buttons else {}),
+        }
+
+        btn_call_data = utils.rand(10)
+
+        self._custom_map[btn_call_data] = {
+            "handler": functools.partial(
+                self._list_page,
+                unit_id=unit_id,
+            ),
+            **(
+                {"ttl": self._units[unit_id]["ttl"]}
+                if "ttl" in self._units[unit_id]
+                else {}
+            ),
+            **({"always_allow": always_allow} if always_allow else {}),
+            **({"force_me": force_me} if force_me else {}),
+            **({"disable_security": disable_security} if disable_security else {}),
+            **({"perms_map": perms_map} if perms_map else {}),
+            **({"message": message} if isinstance(message, AiogramMessage) else {}),
+        }
+
+        if isinstance(message, AiogramMessage) and not silent:
+            try:
+                status_message = await message.answer(
+                    "🌘 Opening list...",
+                )
+            except Exception:
+                status_message = None
+        else:
+            status_message = None
+
+        async def answer(msg: str):
+            nonlocal message
+            if isinstance(message, AiogramMessage):
+                await message.answer(msg)
+            else:
+                await self.bot.send_message(message, msg)
+
+        try:
+            chat_id = (
+                utils.get_chat_id(message)
+                if isinstance(message, AiogramMessage)
+                else message
+            )
+
+            m = await self.bot.send_message(
+                chat_id,
+                self.sanitise_text(strings[0]),
+                reply_markup=self._list_markup(unit_id),
+                disable_web_page_preview=True,
+                **(
+                    {"reply_to_message_id": message.message_id}
+                    if isinstance(message, AiogramMessage)
+                    else {}
+                ),
+            )
+        except Exception:
+            logger.exception("Can't send list")
+
+            del self._units[unit_id]
+            await answer(
+                "🚫 <b>Can't send list. Error in logs</b>"
+                + (
+                    "\n<i>"
+                    + utils.escape_html(
+                        "\n".join(traceback.format_exc().splitlines()[1:])
+                    )
+                    + "</i>"
+                )
+                if self._db.get("mokasi.main", "inlinelogs", True)
+                else ""
+            )
+
+            return False
+
+        self._units[unit_id]["chat"] = utils.get_chat_id(m)
+        self._units[unit_id]["message_id"] = m.message_id
+
+        if status_message:
+            with contextlib.suppress(Exception):
+                await status_message.delete()
+
+        return InlineMessage(
+            self,
+            unit_id,
+            chat_id=self._units[unit_id]["chat"],
+            message_id=m.message_id,
+        )
+
+    async def _list_page(
+        self,
+        call: CallbackQuery,
+        page: typing.Union[int, str],
+        unit_id: str = None,
+    ):
+        if page == "close":
+            await self._delete_unit_message(call, unit_id=unit_id)
+            return
+
+        if self._units[unit_id]["current_index"] < 0 or page >= len(
+            self._units[unit_id]["strings"]
+        ):
+            await call.answer("Can't go to this page", show_alert=True)
+            return
+
+        self._units[unit_id]["current_index"] = page
+
+        kwargs = self._edit_kwargs(
+            call=call,
+            unit=self._units[unit_id],
+        )
+
+        if not kwargs:
+            await call.answer("Error occurred", show_alert=True)
+            return
+
+        try:
+            await self.bot.edit_message_text(
+                **kwargs,
+                text=self.sanitise_text(
+                    self._units[unit_id]["strings"][
+                        self._units[unit_id]["current_index"]
+                    ]
+                ),
+                reply_markup=self._list_markup(unit_id),
+            )
+            await call.answer()
+        except TelegramRetryAfter as e:
+            await call.answer(
+                f"Got FloodWait. Wait for {e.retry_after} seconds",
+                show_alert=True,
+            )
+        except Exception:
+            logger.exception("Exception while trying to edit list")
+            await call.answer("Error occurred", show_alert=True)
+            return
+
+    def _list_markup(self, unit_id: str) -> InlineKeyboardMarkup:
+        """Generates aiogram markup for `list`"""
+        callback = functools.partial(self._list_page, unit_id=unit_id)
+        return self.generate_markup(
+            self._patch_unit_security(
+                self._units[unit_id].get("custom_buttons", [])
+                + self.build_pagination(
+                    callback=callback,
+                    total_pages=len(self._units[unit_id]["strings"]),
+                    unit_id=unit_id,
+                )
+                + [[{"text": "🔻 Close", "callback": callback, "args": ("close",)}]],
+                unit_id,
+            )
+        )
