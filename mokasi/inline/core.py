@@ -1,7 +1,7 @@
-# Mokasi — a modular personal Telegram bot framework
-# Inline manager, ported from Hikka (https://github.com/hikariatama/Hikka)
-# The manager uses the shared aiogram Bot of the framework — no polling of
-# its own, handlers are registered in the single framework Router
+# Mokasi — a modular personal Telegram bot
+# Inline manager
+# The manager uses the shared aiogram Bot — no polling of its own,
+# handlers are registered in the single Router
 """Inline buttons, galleries and other Telegram-Bot-API stuff"""
 
 import asyncio

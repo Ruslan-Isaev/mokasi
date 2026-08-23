@@ -1,5 +1,5 @@
-# Mokasi — a modular personal Telegram bot framework
-# Pointer wrappers ported from Hikka (https://github.com/hikariatama/Hikka)
+# Mokasi — a modular personal Telegram bot
+# Pointer wrappers
 import typing
 
 

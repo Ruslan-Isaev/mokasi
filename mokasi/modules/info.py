@@ -55,7 +55,7 @@ class InfoMod(loader.Module):
     def _render_info(self) -> str:
         ver = ".".join(map(str, version.__version__))
         return (
-            "🌘 <b>Mokasi Userbot Framework</b>\n\n"
+            "🌘 <b>Mokasi</b>\n\n"
             f"<b>Version:</b> <code>{ver}</code>\n"
             f"<b>Modules:</b> <code>{len(self.allmodules.modules)}</code>\n"
             f"<b>Commands:</b> <code>{len(self.allmodules.commands)}</code>\n"

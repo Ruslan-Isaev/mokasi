@@ -1,6 +1,5 @@
-# Mokasi — a modular personal Telegram bot framework
-# Inline paginated lists, ported from Hikka
-# (https://github.com/hikariatama/Hikka) and adapted for aiogram 3
+# Mokasi — a modular personal Telegram bot
+# Inline paginated lists
 import asyncio
 import contextlib
 import functools

@@ -1,5 +1,5 @@
-# Mokasi — a modular personal Telegram bot framework
-# Inline galleries, ported from Hikka (https://github.com/hikariatama/Hikka)
+# Mokasi — a modular personal Telegram bot
+# Inline galleries
 # and adapted for aiogram 3
 import asyncio
 import contextlib
@@ -264,7 +264,6 @@ class Gallery(InlineUnit):
             )
 
             kwargs = {
-                "chat_id": chat_id,
                 "caption": self._get_caption(unit_id, index=0),
                 "reply_markup": self._gallery_markup(unit_id),
                 **(
@@ -277,11 +276,13 @@ class Gallery(InlineUnit):
             if unit := self._units[unit_id]:
                 if unit.get("gif", False):
                     m = await self.bot.send_animation(
+                        chat_id,
                         unit["photo_url"],
                         **kwargs,
                     )
                 else:
                     m = await self.bot.send_photo(
+                        chat_id,
                         unit["photo_url"],
                         **kwargs,
                     )

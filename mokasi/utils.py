@@ -1,5 +1,5 @@
-# Mokasi — a modular personal Telegram bot framework
-# Utilities, ported from Hikka (https://github.com/hikariatama/Hikka)
+# Mokasi — a modular personal Telegram bot
+# Utilities
 # and adapted for aiogram 3
 import asyncio
 import functools
@@ -77,7 +77,7 @@ def is_emoji(grapheme: str, /) -> bool:
 def get_bot(message: typing.Optional[AiogramMessage]) -> typing.Optional[typing.Any]:
     """
     Resolve the aiogram Bot bound to the message.
-    Falls back to the framework singleton, because the contextvar
+    Falls back to the global singleton, because the contextvar
     does not always propagate into detached tasks.
     :param message: Message to resolve the bot from
     :return: Bot instance or None

@@ -1,6 +1,5 @@
-# Mokasi — a modular personal Telegram bot framework
-# Inline markup generation and unit editing, ported from Hikka
-# (https://github.com/hikariatama/Hikka) and adapted for aiogram 3
+# Mokasi — a modular personal Telegram bot
+# Inline markup generation and unit editing
 import asyncio
 import contextlib
 import functools

@@ -1,5 +1,5 @@
-# Mokasi — a modular personal Telegram bot framework
-# Inline forms, ported from Hikka (https://github.com/hikariatama/Hikka)
+# Mokasi — a modular personal Telegram bot
+# Inline forms
 # The form is sent directly through Bot API — no `_invoke_unit` trick needed
 import contextlib
 import copy
@@ -311,25 +311,32 @@ class Form(InlineUnit):
             )
 
             send_kwargs = {
-                "chat_id": chat_id,
                 "reply_markup": self.generate_markup(unit_id),
                 **({"reply_to_message_id": reply_to} if reply_to else {}),
             }
 
             if photo:
-                m = await self.bot.send_photo(photo, caption=text, **send_kwargs)
+                m = await self.bot.send_photo(
+                    chat_id, photo, caption=text, **send_kwargs
+                )
             elif gif:
-                m = await self.bot.send_animation(gif, caption=text, **send_kwargs)
+                m = await self.bot.send_animation(
+                    chat_id, gif, caption=text, **send_kwargs
+                )
             elif video:
-                m = await self.bot.send_video(video, caption=text, **send_kwargs)
+                m = await self.bot.send_video(
+                    chat_id, video, caption=text, **send_kwargs
+                )
             elif file:
                 m = await self.bot.send_document(
+                    chat_id,
                     file,
                     caption=text,
                     **send_kwargs,
                 )
             elif audio:
                 m = await self.bot.send_audio(
+                    chat_id,
                     audio["url"],
                     caption=text,
                     title=audio.get("title"),
@@ -339,12 +346,14 @@ class Form(InlineUnit):
                 )
             elif location:
                 m = await self.bot.send_location(
+                    chat_id,
                     location[0],
                     location[1],
                     **send_kwargs,
                 )
             else:
                 m = await self.bot.send_message(
+                    chat_id,
                     text,
                     disable_web_page_preview=True,
                     **send_kwargs,

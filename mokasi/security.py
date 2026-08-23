@@ -1,5 +1,5 @@
-# Mokasi — a modular personal Telegram bot framework
-# Security model, ported from Hikka (https://github.com/hikariatama/Hikka)
+# Mokasi — a modular personal Telegram bot
+# Security model
 # and adapted for a single bot: bit-flag masks + owner list
 """Checks the commands' security"""
 

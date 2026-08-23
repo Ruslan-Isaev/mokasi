@@ -1,4 +1,4 @@
-# Mokasi — a modular personal Telegram bot framework
+# Mokasi — a modular personal Telegram bot
 from .core import InlineManager
 from .types import InlineCall, InlineMessage, InlineQuery, InlineUnit
 

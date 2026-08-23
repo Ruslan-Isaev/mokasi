@@ -217,9 +217,9 @@ async def db_checks():
 asyncio.run(db_checks())
 
 
-# --- Framework (module system, security, dispatch, inline) -----------------
+# --- Core (module system, security, dispatch, inline) ----------------------
 
-section("framework")
+section("core")
 
 import datetime  # noqa: E402
 import importlib.machinery  # noqa: E402
@@ -463,7 +463,7 @@ async def security_checks():
         not await sm.check(user_id=222, func=plain_func),
     )
     check(
-        "owners bypass blacklist (hikka behavior)",
+        "owners bypass blacklist",
         await sm.check(user_id=111, func=plain_func),
     )
     sdb.set("mokasi.main", "blacklist_users", [])

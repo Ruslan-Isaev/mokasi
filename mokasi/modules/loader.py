@@ -150,7 +150,10 @@ class LoaderMod(loader.Module):
         for node in module.body:
             if isinstance(node, ast.ClassDef):
                 for base in node.bases:
+                    # Support both `class X(Module)` and `class X(loader.Module)`
                     if isinstance(base, ast.Name) and base.id == "Module":
+                        return node.name
+                    if isinstance(base, ast.Attribute) and base.attr == "Module":
                         return node.name
 
         return None

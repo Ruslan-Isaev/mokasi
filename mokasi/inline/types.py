@@ -1,5 +1,5 @@
-# Mokasi — a modular personal Telegram bot framework
-# Inline wrappers, ported from Hikka (https://github.com/hikariatama/Hikka)
+# Mokasi — a modular personal Telegram bot
+# Inline wrappers
 # and reworked for aiogram 3: composition instead of subclassing
 # (aiogram 3 types are pydantic models)
 import logging

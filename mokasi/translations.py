@@ -1,5 +1,5 @@
-# Mokasi — a modular personal Telegram bot framework
-# Translation system, ported from Hikka (https://github.com/hikariatama/Hikka)
+# Mokasi — a modular personal Telegram bot
+# Translation system
 # and simplified: JSON langpacks only, built-in validator strings
 import json
 import logging

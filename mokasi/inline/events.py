@@ -1,6 +1,5 @@
-# Mokasi — a modular personal Telegram bot framework
-# Inline event handlers, ported from Hikka
-# (https://github.com/hikariatama/Hikka) and adapted for aiogram 3
+# Mokasi — a modular personal Telegram bot
+# Inline event handlers
 import inspect
 import logging
 import re

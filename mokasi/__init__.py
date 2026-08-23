@@ -1,2 +1,2 @@
-# Mokasi — a modular personal Telegram bot framework
+# Mokasi — a modular personal Telegram bot
 __version__ = (1, 0, 0)

@@ -1,5 +1,5 @@
-# Mokasi — a modular personal Telegram bot framework
-# Boot sequence, ported from Hikka (https://github.com/hikariatama/Hikka)
+# Mokasi — a modular personal Telegram bot
+# Boot sequence
 # and adapted for aiogram 3: single Bot, single Router with 4 catch-alls
 import asyncio
 import contextlib

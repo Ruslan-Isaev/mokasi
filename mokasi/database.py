@@ -1,6 +1,5 @@
-# Mokasi — a modular personal Telegram bot framework
-# JSON dict database with revision ring, ported from Hikka
-# (https://github.com/hikariatama/Hikka)
+# Mokasi — a modular personal Telegram bot
+# JSON dict database with revision ring
 import json
 import logging
 import time

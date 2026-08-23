@@ -1,5 +1,5 @@
-# Mokasi — a modular personal Telegram bot framework
-# Core types, ported from Hikka (https://github.com/hikariatama/Hikka)
+# Mokasi — a modular personal Telegram bot
+# Core types
 # and adapted for aiogram 3
 import ast
 import asyncio
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 JSONSerializable = typing.Union[str, int, float, bool, list, dict, None]
 ReplyMarkup = typing.Union[typing.List[typing.List[dict]], typing.List[dict], dict]
-# Kept for hikka compatibility
+# Deprecated alias, kept for compatibility
 HikkaReplyMarkup = ReplyMarkup
 ListLike = typing.Union[list, set, tuple]
 Command = typing.Callable[..., typing.Awaitable[typing.Any]]

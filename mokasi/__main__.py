@@ -1,4 +1,4 @@
-# Mokasi — a modular personal Telegram bot framework
+# Mokasi — a modular personal Telegram bot
 import asyncio
 import logging
 

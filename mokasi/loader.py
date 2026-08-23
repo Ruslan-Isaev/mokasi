@@ -1,6 +1,5 @@
-# Mokasi — a modular personal Telegram bot framework
-# Module registry and lifecycle, ported from Hikka
-# (https://github.com/hikariatama/Hikka) and adapted for aiogram 3
+# Mokasi — a modular personal Telegram bot
+# Module registry and lifecycle
 """Registers modules"""
 
 import asyncio
@@ -76,7 +75,7 @@ logger = logging.getLogger(__name__)
 
 owner = security.owner
 
-# Deprecated, kept for hikka compatibility
+# Deprecated, kept for compatibility
 sudo = security.sudo
 support = security.support
 

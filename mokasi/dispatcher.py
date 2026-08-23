@@ -1,5 +1,5 @@
-# Mokasi — a modular personal Telegram bot framework
-# Command dispatcher, ported from Hikka (https://github.com/hikariatama/Hikka)
+# Mokasi — a modular personal Telegram bot
+# Command dispatcher
 # and adapted for aiogram 3
 import asyncio
 import collections

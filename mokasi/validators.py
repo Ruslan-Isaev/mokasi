@@ -1,5 +1,5 @@
-# Mokasi — a modular personal Telegram bot framework
-# Config validators, ported from Hikka (https://github.com/hikariatama/Hikka)
+# Mokasi — a modular personal Telegram bot
+# Config validators
 import functools
 import re
 import typing
